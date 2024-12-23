@@ -10,7 +10,6 @@ public enum UserRole {
 
     private String value;
 
-
     UserRole(String  value) {
         this.value = value;
 
