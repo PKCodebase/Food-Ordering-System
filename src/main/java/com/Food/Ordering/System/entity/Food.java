@@ -1,7 +1,6 @@
 package com.Food.Ordering.System.entity;
 
 import jakarta.persistence.*;
-import jdk.jfr.Category;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

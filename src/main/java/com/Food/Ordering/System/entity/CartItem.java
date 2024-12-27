@@ -12,19 +12,24 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class IngredientCategory {
+public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String name;
-
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "restaurant_id")
-    private Restaurant restaurant;
+    @JoinColumn(name= "cart_id")
+    private Cart cart;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "ingredientCategory")
-    private List<IngredientsItem> ingredientsItems;
+    @ManyToOne
+    @JoinColumn(name = "food_id")
+    private Food food;
+
+    private int quantity;
+
+    private Long totalPrice;
+
+    private List<String> ingredients;
 }

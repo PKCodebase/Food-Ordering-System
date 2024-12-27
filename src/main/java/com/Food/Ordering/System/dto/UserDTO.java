@@ -1,26 +1,24 @@
-package com.Food.Ordering.System.entity;
+package com.Food.Ordering.System.dto;
 
-import com.Food.Ordering.System.dto.RestaurantDTO;
+import com.Food.Ordering.System.entity.Address;
+import com.Food.Ordering.System.entity.Order;
+import com.Food.Ordering.System.entity.Restaurant;
 import com.Food.Ordering.System.enums.UserRole;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Builder
-public class User {
+@NoArgsConstructor
+public class UserDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private  Long id;
 
     @NotBlank(message = "Full name cannot be blank")
     @Pattern(regexp = "^[A-Za-z ]+$", message = "Name must contain only letters")
@@ -41,25 +39,20 @@ public class User {
             message = "Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character")
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.CUSTOMER;
+    private UserRole role;
 
-    //One user can have many order Objects
-    @JsonIgnore
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Order> orders;
 
-    @ElementCollection
     private List<RestaurantDTO> restaurants;
 
-    //One user can have many address
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses;
 
-    public Long getId() {
+    private Restaurant restaurant;
+
+
+       public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -126,5 +119,13 @@ public class User {
 
     public void setAddresses(List<Address> addresses) {
         this.addresses = addresses;
+    }
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 }
