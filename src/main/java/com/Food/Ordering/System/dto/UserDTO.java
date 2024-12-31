@@ -20,26 +20,29 @@ public class UserDTO {
 
     private  Long id;
 
-    @NotBlank(message = "Full name cannot be blank")
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "Name must contain only letters")
+    @NotBlank(message = "Full name is required")
     private String fullName;
 
-    @NotBlank(message = "Email cannot be blank")
-    @Email(message = "Invalid email format")
+    @Email(message = "Email should be valid")
     private String email;
 
+    @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
+    private String  phone;
 
-    @NotBlank(message = "Phone number cannot be blank")
-    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be exactly 10 digits")
-    private Long phone;
-
-
-    @NotBlank(message = "Password cannot be blank")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$",
-            message = "Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character")
+    @NotBlank(message = "Password is required")
     private String password;
 
     private UserRole role;
+
+    private String newPassword;
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
 
     private List<Order> orders;
 
@@ -73,11 +76,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    public Long getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(Long phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
