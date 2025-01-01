@@ -45,7 +45,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/change-password")
+    @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody UserDTO userDTO) {
         try {
             String message = authService.changePassword(
