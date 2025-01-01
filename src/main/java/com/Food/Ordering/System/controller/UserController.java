@@ -1,73 +1,72 @@
 package com.Food.Ordering.System.controller;
 
-import com.Food.Ordering.System.dto.UserDTO;
 import com.Food.Ordering.System.entity.User;
-import com.Food.Ordering.System.exception.*;
-import com.Food.Ordering.System.service.Impl.UserService;
-import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
+import com.Food.Ordering.System.exception.EmailNotFoundException;
+import com.Food.Ordering.System.exception.PhoneNotFoundException;
+import com.Food.Ordering.System.exception.UserNotFoundException;
+import com.Food.Ordering.System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-
 @RestController
-@RequestMapping("users")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTO userDTO) {
-        try {
-            User user = userService.registerUser(userDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Registered Successfully");
-        } catch (EmailAlreadyExistException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
-        } catch (PhoneAlreadyExistException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Phone number already exists");
-        }catch (PasswordValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("One Capital letter,small letter,special symbol,number");
+    // Get user by email
+    @GetMapping("/byEmail")
+    public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
+        User user = userService.getUserByEmail(email);
+        if(user == null){
+            throw new EmailNotFoundException("Email not exist");
         }
-    }
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestParam String email, @RequestParam String password) {
-        try {
-            Optional<String> message = userService.loginUser(email, password);
-            return ResponseEntity.ok(message);
-        } catch (UserNotFoundException | IncorrectPasswordException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
+        return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
-        try {
-            String message = userService.forgotPassword(email);
-            return ResponseEntity.ok(message);
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    // Get user by phone
+    @GetMapping("/byPhone")
+    public ResponseEntity<User> getUserByPhone(@RequestParam String phone) throws PhoneNotFoundException {
+
+            User user = userService.getUserByPhone(phone);
+            if (phone == null) {
+                throw new PhoneNotFoundException("Phone not exist");
+            }
+            return ResponseEntity.ok(user);
+    }
+
+    // Get user by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) throws UserNotFoundException {
+        User user = userService.getUserById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
-    @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody UserDTO userDTO) {
-        try {
-            String message = userService.changePassword(
-                    userDTO.getEmail(),
-                    userDTO.getPassword(),
-                    userDTO.getNewPassword()
-            );
-            return ResponseEntity.ok(message);
-        } catch (UserNotFoundException | IncorrectPasswordException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    // Get all users
+    @GetMapping
+    public ResponseEntity<?> getAllUser() {
+        return ResponseEntity.ok(userService.getAllUser());
+    }
+
+    // Delete user by ID
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteUserById(@PathVariable Long id) throws UserNotFoundException {
+        User userOptional = userService.getUserById(id);
+        User user = userService.getUserById(id);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with ID: " + id);
         }
+        return ResponseEntity.ok("User deleted successfully");
     }
 }
+
+
+

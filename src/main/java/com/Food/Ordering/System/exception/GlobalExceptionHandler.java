@@ -33,6 +33,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleIncorrectPasswordException(PasswordValidationException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(PhoneNotFoundException.class)
+    public ResponseEntity<String> handlePhoneNotFoundException(PhoneNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<String> handleEmailNotFoundException(EmailNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(RestaurantNotFoundException.class)
+    public ResponseEntity<String> handleRestaurantNotFoundException(RestaurantNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
 
 
 
