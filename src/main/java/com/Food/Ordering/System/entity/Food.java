@@ -32,10 +32,6 @@ public class Food {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(length = 1000)
-    @ElementCollection
-    public List<String> images;
-
     private boolean available;
 
     //Many Food items can belong to one Restaurant.
@@ -57,4 +53,100 @@ public class Food {
     private List<IngredientsItem> ingredientsItems;
 
     private Date  creationDate;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getPrice() {
+        return Price;
+    }
+
+    public void setPrice(Long price) {
+        Price = price;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public boolean isVegetarian() {
+        return isVegetarian;
+    }
+
+    public void setVegetarian(boolean vegetarian) {
+        isVegetarian = vegetarian;
+    }
+
+    public boolean isSeasonal() {
+        return isSeasonal;
+    }
+
+    public void setSeasonal(boolean seasonal) {
+        isSeasonal = seasonal;
+    }
+
+    public List<IngredientsItem> getIngredientsItems() {
+        return ingredientsItems;
+    }
+
+    public void setIngredientsItems(List<IngredientsItem> ingredientsItems) {
+        this.ingredientsItems = ingredientsItems;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
 }

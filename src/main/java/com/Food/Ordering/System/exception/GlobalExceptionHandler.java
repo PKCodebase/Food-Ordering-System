@@ -45,6 +45,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleRestaurantNotFoundException(RestaurantNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(FoodNotFoundException.class)
+    public ResponseEntity<String> handleCategoryNotFoundException(FoodNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<String> handleCategoryNotFoundException(CategoryNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(IngredientCategoryNotFound.class)
+    public ResponseEntity<String> handleOrderNotFoundException(IngredientCategoryNotFound ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
 
 
 

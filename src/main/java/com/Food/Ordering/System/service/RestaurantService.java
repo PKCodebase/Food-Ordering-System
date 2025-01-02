@@ -1,5 +1,6 @@
 package com.Food.Ordering.System.service;
 
+import com.Food.Ordering.System.entity.Category;
 import com.Food.Ordering.System.entity.Restaurant;
 
 import java.util.List;

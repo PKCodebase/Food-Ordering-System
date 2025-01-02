@@ -17,21 +17,21 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     // Add a new restaurant
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<String> addRestaurant(@RequestBody Restaurant restaurant) {
         String response = restaurantService.addRestaurant(restaurant);
         return ResponseEntity.ok(response);
     }
 
     // Get restaurant by ID
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<Restaurant> getRestaurantById(@PathVariable Long id) {
         Restaurant restaurant = restaurantService.getRestaurantById(id);
         return ResponseEntity.ok(restaurant);
     }
 
     // Update restaurant by ID
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<String> updateRestaurantById(
             @PathVariable Long id, @RequestBody Restaurant updatedRestaurant) {
         String response = restaurantService.updateRestaurantById(id, updatedRestaurant);
@@ -39,14 +39,14 @@ public class RestaurantController {
     }
 
     // Delete restaurant by ID
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteRestaurantById(@PathVariable Long id) {
         String response = restaurantService.deleteRestaurantById(id);
         return ResponseEntity.ok(response);
     }
 
     // Get all restaurants
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Restaurant>> getAllRestaurants() {
         List<Restaurant> restaurants = restaurantService.getAllRestaurant();
         return ResponseEntity.ok(restaurants);
