@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class IngredientsServiceImpl implements IngredientsService {
@@ -50,8 +49,6 @@ public class IngredientsServiceImpl implements IngredientsService {
         return ingredientCategories;
 
     }
-
-
 
     @Override
     public String createIngredientsItem(Long restaurantId, String ingredientName, Long ingredientCategoryId) {
