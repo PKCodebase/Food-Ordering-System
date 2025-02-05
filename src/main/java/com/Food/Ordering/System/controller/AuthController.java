@@ -1,6 +1,6 @@
 package com.Food.Ordering.System.controller;
 
-import com.Food.Ordering.System.dto.UserDTO;
+
 import com.Food.Ordering.System.entity.User;
 import com.Food.Ordering.System.exception.*;
 import com.Food.Ordering.System.service.AuthService;
@@ -23,7 +23,7 @@ public class AuthController {
     private ModelMapper modelMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody User userDTO) {
         try {
             User user = authService.registerUser(userDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body("Registered Successfully");
@@ -46,7 +46,7 @@ public class AuthController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> changePassword(@RequestBody User userDTO) {
         try {
             String message = authService.changePassword(
                     userDTO.getEmail(),

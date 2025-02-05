@@ -19,8 +19,8 @@ public class RestaurantController {
     // Add a new restaurant
     @PostMapping("/add")
     public ResponseEntity<String> addRestaurant(@RequestBody Restaurant restaurant) {
-        String response = restaurantService.addRestaurant(restaurant);
-        return ResponseEntity.ok(response);
+        Restaurant response = restaurantService.addRestaurant(restaurant);
+        return ResponseEntity.ok("Restaurant added successfully");
     }
 
     // Get restaurant by ID

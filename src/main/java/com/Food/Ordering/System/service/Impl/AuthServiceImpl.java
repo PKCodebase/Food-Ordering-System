@@ -1,6 +1,5 @@
 package com.Food.Ordering.System.service.Impl;
 
-import com.Food.Ordering.System.dto.UserDTO;
 import com.Food.Ordering.System.entity.User;
 import com.Food.Ordering.System.exception.*;
 import com.Food.Ordering.System.repository.AuthRepository;
@@ -30,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private JwtUtil  jwtUtil;
 
     @Override
-    public User registerUser(UserDTO userDTO) throws EmailAlreadyExistException, PhoneAlreadyExistException, PasswordValidationException {
+    public User registerUser(User userDTO) throws EmailAlreadyExistException, PhoneAlreadyExistException, PasswordValidationException {
         Optional<User> existingUserByEmail = authRepository.findByEmail(userDTO.getEmail());
         if (existingUserByEmail.isPresent()) {
             throw new EmailAlreadyExistException("Email already exists");

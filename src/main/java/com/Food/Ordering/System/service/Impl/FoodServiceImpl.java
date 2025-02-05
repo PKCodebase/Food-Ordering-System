@@ -1,6 +1,5 @@
 package com.Food.Ordering.System.service.Impl;
 
-import com.Food.Ordering.System.dto.FoodDTO;
 import com.Food.Ordering.System.entity.Category;
 import com.Food.Ordering.System.entity.Food;
 import com.Food.Ordering.System.entity.IngredientsItem;
@@ -22,7 +21,7 @@ public class FoodServiceImpl implements FoodService {
     private FoodRepository foodRepository;
 
     @Override
-    public String addFood(FoodDTO foodDTO, Category category, Restaurant restaurant) {
+    public String addFood(Food foodDTO, Category category, Restaurant restaurant) {
         Food food = new Food();
         food.setName(foodDTO.getName());
         food.setDescription(foodDTO.getDescription());

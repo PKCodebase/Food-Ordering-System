@@ -1,21 +1,23 @@
 package com.Food.Ordering.System.service;
 
-import com.Food.Ordering.System.dto.CartItemDTO;
+
 import com.Food.Ordering.System.entity.Cart;
+import com.Food.Ordering.System.entity.CartItem;
+import com.Food.Ordering.System.exception.CartNotFoundException;
 
 public interface CartService {
 
-    String  addProductToCart(CartItemDTO cartItemDTO, String jwt);
+    String  addProductToCart(CartItem cartItem, String email) throws CartNotFoundException;
 
-    String updateCart(Long cartItemId, int quantity);
+    String updateCart(Long cartItemId, int quantity) throws CartNotFoundException;
 
-    String removeProductFromCart(Long productId, String jwt);
+    Cart removeProductToCart(Long productId, String jwt) throws CartNotFoundException;
 
-    Long calculateCartTotals(Long id);
+    Long calculateCartTotals(Cart id) throws CartNotFoundException;
 
-    Cart findCartByUserId(Long userId);
+    public Cart findCartById(Long id) throws Exception;
 
-    Cart findCartByCartId(Long cartId);
+    public Cart findCartByUserId(Long userId) throws Exception;
 
     String clearCart(Long userId);
 

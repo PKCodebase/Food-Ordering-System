@@ -1,6 +1,6 @@
 package com.Food.Ordering.System.entity;
 
-import com.Food.Ordering.System.dto.RestaurantDTO;
+
 import com.Food.Ordering.System.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -50,7 +50,7 @@ public class User {
     private List<Order> orders;
 
     @ElementCollection
-    private List<RestaurantDTO> restaurants;
+    private List<Restaurant> restaurants;
 
     //One user can have many address
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -112,11 +112,11 @@ public class User {
         this.orders = orders;
     }
 
-    public List<RestaurantDTO> getRestaurants() {
+    public List<Restaurant> getRestaurants() {
         return restaurants;
     }
 
-    public void setRestaurants(List<RestaurantDTO> restaurants) {
+    public void setRestaurants(List<Restaurant> restaurants) {
         this.restaurants = restaurants;
     }
 

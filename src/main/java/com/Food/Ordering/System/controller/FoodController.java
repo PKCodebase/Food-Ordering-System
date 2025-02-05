@@ -1,7 +1,7 @@
 package com.Food.Ordering.System.controller;
 
 
-import com.Food.Ordering.System.dto.FoodDTO;
+
 import com.Food.Ordering.System.entity.Category;
 import com.Food.Ordering.System.entity.Food;
 import com.Food.Ordering.System.entity.Restaurant;
@@ -32,7 +32,7 @@ public class FoodController {
     private UserService userService;
 
     @PostMapping("/add")
-    public ResponseEntity<String> addFood(@RequestBody FoodDTO foodDTO,
+    public ResponseEntity<String> addFood(@RequestBody Food foodDTO,
                                           @RequestParam Long categoryId,
                                           @RequestParam Long restaurantId) {
         try {
