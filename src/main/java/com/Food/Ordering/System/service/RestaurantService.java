@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface RestaurantService {
 
-    Restaurant addRestaurant(Restaurant restaurant);
+    String addRestaurant(Restaurant restaurant);
 
     Restaurant getRestaurantById(Long restid);
 

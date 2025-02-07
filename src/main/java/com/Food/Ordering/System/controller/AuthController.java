@@ -3,6 +3,7 @@ package com.Food.Ordering.System.controller;
 
 import com.Food.Ordering.System.entity.User;
 import com.Food.Ordering.System.exception.*;
+import com.Food.Ordering.System.request.ChangePasswordRequest;
 import com.Food.Ordering.System.service.AuthService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -19,8 +20,6 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @Autowired
-    private ModelMapper modelMapper;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody User userDTO) {
@@ -46,16 +45,17 @@ public class AuthController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody User userDTO) {
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         try {
             String message = authService.changePassword(
-                    userDTO.getEmail(),
-                    userDTO.getPassword(),
-                    userDTO.getNewPassword()
+                    request.getEmail(),
+                    request.getOldPassword(),
+                    request.getNewPassword()
             );
             return ResponseEntity.ok(message);
         } catch (UserNotFoundException | IncorrectPasswordException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
 }
