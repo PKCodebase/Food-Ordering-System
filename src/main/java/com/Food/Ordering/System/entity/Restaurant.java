@@ -38,7 +38,7 @@ public class Restaurant {
 
     //Many restaurants can be owned by one user.
     @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false,referencedColumnName = "id")
+    @JoinColumn(name = "owner_id", nullable = true,referencedColumnName = "id")
     private User owner;
 
     //Each restaurant has exactly one address.

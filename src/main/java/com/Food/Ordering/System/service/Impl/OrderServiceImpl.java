@@ -24,8 +24,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
-    @Autowired
-    private AuthRepository authRepository;
+//    @Autowired
+//    private AuthRepository authRepository;
+
 
     @Autowired
     private AddressRepository addressRepository;
@@ -46,7 +47,7 @@ public class OrderServiceImpl implements OrderService {
         Address savedAddress = addressRepository.save(shippingAddress);
         if (!user.getAddresses().contains(savedAddress)) {
             user.getAddresses().add(savedAddress);
-            authRepository.save(user);
+            userRepository.save(user);
         }
 
         // Get the restaurant based on the order

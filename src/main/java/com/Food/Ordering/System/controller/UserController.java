@@ -7,9 +7,9 @@ import com.Food.Ordering.System.exception.UserNotFoundException;
 import com.Food.Ordering.System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -20,6 +20,7 @@ public class UserController {
 
     // Get user by email
     @GetMapping("/byEmail")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
         User user = userService.getUserByEmail(email);
         if(user == null){
@@ -30,6 +31,7 @@ public class UserController {
 
     // Get user by phone
     @GetMapping("/byPhone")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> getUserByPhone(@RequestParam String phone) throws PhoneNotFoundException {
 
             User user = userService.getUserByPhone(phone);
@@ -41,6 +43,7 @@ public class UserController {
 
     // Get user by ID
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable Long id) throws UserNotFoundException {
         User user = userService.getUserById(id);
         if (user != null) {
@@ -51,13 +54,15 @@ public class UserController {
     }
 
     // Get all users
-    @GetMapping
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllUser() {
         return ResponseEntity.ok(userService.getAllUser());
     }
 
     // Delete user by ID
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUserById(@PathVariable Long id) throws UserNotFoundException {
         User userOptional = userService.getUserById(id);
         User user = userService.getUserById(id);

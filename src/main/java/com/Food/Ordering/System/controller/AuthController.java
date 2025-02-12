@@ -1,61 +1,83 @@
-package com.Food.Ordering.System.controller;
+    package com.Food.Ordering.System.controller;
+
+    import com.Food.Ordering.System.entity.User;
+    import com.Food.Ordering.System.repository.UserRepository;
+    import com.Food.Ordering.System.util.JwtUtil;
+    import lombok.RequiredArgsConstructor;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.security.authentication.AuthenticationManager;
+    import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+    import org.springframework.security.core.Authentication;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.web.bind.annotation.*;
+
+    import java.util.Map;
+    import java.util.Optional;
+
+    @RestController
+    @RequestMapping("/auth")
+    public class AuthController {
 
 
-import com.Food.Ordering.System.entity.User;
-import com.Food.Ordering.System.exception.*;
-import com.Food.Ordering.System.request.ChangePasswordRequest;
-import com.Food.Ordering.System.service.AuthService;
-import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+        private final PasswordEncoder passwordEncoder;
+        private final UserRepository userRepository;
+        private final AuthenticationManager authenticationManager;
+        private final JwtUtil jwtUtil;
 
-
-@RestController
-@RequestMapping("/Auth")
-public class AuthController {
-
-    @Autowired
-    private AuthService authService;
-
-
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User userDTO) {
-        try {
-            User user = authService.registerUser(userDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Registered Successfully");
-        } catch (EmailAlreadyExistException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
-        } catch (PhoneAlreadyExistException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Phone number already exists");
-        }catch (PasswordValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("One Capital letter,small letter,special symbol,number");
+        public AuthController(PasswordEncoder passwordEncoder, UserRepository userRepository, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+            this.passwordEncoder = passwordEncoder;
+            this.userRepository = userRepository;
+            this.authenticationManager = authenticationManager;
+            this.jwtUtil = jwtUtil;
         }
-    }
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestParam String email, @RequestParam String password) {
-        try {
-            String token = authService.loginUser(email, password);
-            return ResponseEntity.ok(token);
-        } catch (UserNotFoundException | IncorrectPasswordException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-    }
 
-    @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
-        try {
-            String message = authService.changePassword(
-                    request.getEmail(),
-                    request.getOldPassword(),
-                    request.getNewPassword()
-            );
-            return ResponseEntity.ok(message);
-        } catch (UserNotFoundException | IncorrectPasswordException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+        // **User Registration**
+        @PostMapping("/register")
+        public ResponseEntity<String> registerUser(@RequestBody User user) {
+            if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already exists with this email.");
+            }
 
-}
+            // **Ensure password is strong**
+            if (user.getPassword() == null || user.getPassword().length() < 8) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password must be at least 8 characters long.");
+            }
+
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            // Assign default role if not provided
+            if (user.getRole() == null || user.getRole().isEmpty()) {
+                user.setRole("ROLE_USER");
+            }
+
+            userRepository.save(user);
+            return ResponseEntity.ok("User registered successfully.");
+        }
+
+        // **User Login with Query Parameters**
+        @GetMapping("/login")
+        public ResponseEntity<Map<String, String>> login(
+                @RequestParam String email,
+                @RequestParam String password) {
+
+            try {
+                Authentication authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(email, password)
+                );
+
+                Optional<User> optionalUser = userRepository.findByEmail(authentication.getName());
+                if (optionalUser.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid email or password"));
+                }
+
+                User loggedInUser = optionalUser.get();
+                String token = jwtUtil.generateToken(loggedInUser.getEmail(), loggedInUser.getRole());
+
+                return ResponseEntity.ok(Map.of("token", token, "role", loggedInUser.getRole()));
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid email or password"));
+            }
+        }
+
+    }

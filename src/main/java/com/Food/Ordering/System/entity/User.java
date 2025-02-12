@@ -1,7 +1,6 @@
 package com.Food.Ordering.System.entity;
 
 
-import com.Food.Ordering.System.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -24,35 +23,34 @@ public class User {
 
     @NotBlank(message = "Full name cannot be blank")
     @Pattern(regexp = "^[A-Za-z ]+$", message = "Name must contain only letters")
-    private String fullName;
+    private String username;
 
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Invalid email format")
     private String email;
 
-
     @NotBlank(message = "Phone number cannot be blank")
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be exactly 10 digits")
     private String phone;
-
 
     @NotBlank(message = "Password cannot be blank")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
             message = "Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character")
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.CUSTOMER;
 
-    //One user can have many order Objects
+    private String role;
+
+    // One user can have many orders
     @JsonIgnore
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
 
-    @ElementCollection
+    // One user can own multiple restaurants
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Restaurant> restaurants;
 
-    //One user can have many address
+    // One user can have many addresses
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses;
 
@@ -64,12 +62,12 @@ public class User {
         this.id = id;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -96,11 +94,11 @@ public class User {
         this.password = password;
     }
 
-    public UserRole getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(UserRole role) {
+    public void setRole(String role) {
         this.role = role;
     }
 

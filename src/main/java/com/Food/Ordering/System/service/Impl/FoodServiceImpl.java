@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,30 +22,24 @@ public class FoodServiceImpl implements FoodService {
     private FoodRepository foodRepository;
 
     @Override
-    public String addFood(Food foodDTO, Category category, Restaurant restaurant) {
-        Food food = new Food();
-        food.setName(foodDTO.getName());
-        food.setDescription(foodDTO.getDescription());
-        food.setPrice(foodDTO.getPrice());
+    public String addFood(Food food, Category category, Restaurant restaurant) {
         food.setCategory(category);
         food.setRestaurant(restaurant);
-        food.setVegetarian(foodDTO.isVegetarian());
-        food.setSeasonal(foodDTO.isSeasonal());
-        food.setIngredientsItems(foodDTO.getIngredientsItems());
         food.setCreationDate(new Date());
         foodRepository.save(food);
         return "Food added successfully";
-
-
     }
-
     @Override
     public String updateFood(Long foodId) {
-        Food food = foodRepository.findById(foodId)
-                .orElseThrow(() -> new FoodNotFoundException("Food not found with ID: " + foodId));
+        Optional<Food> optionalFood = foodRepository.findById(foodId);
+        if (!optionalFood.isPresent()) {
+            throw new FoodNotFoundException("Food not found with ID: " + foodId);
+        }
+
+        Food food = optionalFood.get();
         food.setAvailable(true);
         foodRepository.save(food);
-        return "Updated Successfully";
+        return "Food availability updated successfully";
     }
 //    private List<IngredientsItem> getIngredientsFromIds(List<Long> ingredientIds) {
 //        // Fetch IngredientsItem entities by their IDs and return as a list
@@ -53,26 +48,29 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public String deleteFood(Long foodId) {
-        Food food = foodRepository.findById(foodId)
-                .orElseThrow(() -> new FoodNotFoundException("Food not found with ID: " + foodId));
-        foodRepository.delete(food);
-        return "Food Deleted successfully";
+        Optional<Food> optionalFood = foodRepository.findById(foodId);
+        if (!optionalFood.isPresent()) {
+            throw new FoodNotFoundException("Food not found with ID: " + foodId);
+        }
+
+        foodRepository.delete(optionalFood.get());
+        return "Food deleted successfully";
     }
 
     @Override
     public List<Food> getAllRestaurantFoods(Long restaurantId, boolean isVegetarian, boolean isNonVeg, boolean isSeasonal, String foodCategory) {
         List<Food> foods = foodRepository.findByRestaurantId(restaurantId);
-
-
         if (foods.isEmpty()) {
             throw new FoodNotFoundException("No foods found for restaurant ID: " + restaurantId);
         }
+
         if (isVegetarian) foods = foods.stream().filter(Food::isVegetarian).collect(Collectors.toList());
         if (isNonVeg) foods = foods.stream().filter(food -> !food.isVegetarian()).collect(Collectors.toList());
         if (isSeasonal) foods = foods.stream().filter(Food::isSeasonal).collect(Collectors.toList());
         if (foodCategory != null && !foodCategory.isEmpty()) {
             foods = foods.stream().filter(food -> food.getCategory().getName().equalsIgnoreCase(foodCategory)).collect(Collectors.toList());
         }
+
         return foods;
     }
 

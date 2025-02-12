@@ -4,7 +4,7 @@ package com.Food.Ordering.System.controller;
 import com.Food.Ordering.System.entity.Order;
 import com.Food.Ordering.System.entity.User;
 import com.Food.Ordering.System.exception.CartNotFoundException;
-import com.Food.Ordering.System.service.AuthService;
+//import com.Food.Ordering.System.service.AuthService;
 import com.Food.Ordering.System.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +20,8 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private AuthService authService;
+//    @Autowired
+//    private AuthService authService;
 
     @PostMapping("/create")
     public ResponseEntity<String> createOrder(@RequestBody Order order, @AuthenticationPrincipal User user) throws CartNotFoundException, Exception {
