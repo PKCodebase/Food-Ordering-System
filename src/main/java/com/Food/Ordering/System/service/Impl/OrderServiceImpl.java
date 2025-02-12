@@ -64,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
         createOrder.setCreatedAt(new Date());
 
         // Generate order items based on the user's cart
-        Cart cart = cartService.findCartById(user.getId());
+          Cart cart = cartService.findCartById(user.getId());
         List<OrderItem> orderItems = new ArrayList<>();
         for (CartItem cartItem : cart.getCartItems()) {
             OrderItem orderItem = new OrderItem();

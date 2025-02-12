@@ -12,6 +12,9 @@ import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
+
+import static javax.crypto.Cipher.SECRET_KEY;
 
 @Component
 public class JwtUtil {
@@ -57,5 +60,12 @@ public class JwtUtil {
     // Get claims from the token
     private Claims getClaims(String token) {
         return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
+    }
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = Jwts.parserBuilder()//Creates a parser to decode the JWT.
+                .setSigningKey(key).build()// Uses the secret key to verify the token’s signature (ensures it’s not tampered with).
+                .parseClaimsJws(token)// Parses the JWT token and extracts the claims (data inside the token).
+                .getBody();//Retrieves the body (payload) of the token where claims (username, role, expiration) are stored.
+        return claimsResolver.apply(claims);
     }
 }
