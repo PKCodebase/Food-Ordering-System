@@ -35,6 +35,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/register", "/auth/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/user/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/restaurants/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER")
+                        .requestMatchers("/food/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER")
+                        .requestMatchers("/category/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER")
+
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

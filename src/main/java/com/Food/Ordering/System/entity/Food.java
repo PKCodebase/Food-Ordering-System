@@ -1,14 +1,14 @@
 package com.Food.Ordering.System.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -18,6 +18,7 @@ public class Food {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
     private String name;
     private String description;
     private Long price;
@@ -44,6 +45,7 @@ public class Food {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "food")
     private List<OrderItem> orderItems;
+
 
     public Long getId() {
         return id;

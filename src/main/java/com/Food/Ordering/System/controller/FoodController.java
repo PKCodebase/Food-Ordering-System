@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/food")
 public class FoodController {
@@ -27,7 +29,8 @@ public class FoodController {
     @Autowired
     private RestaurantService restaurantService;
 
-    // ✅ Add Food
+    // ✅ Admin & Owner can add food
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     @PostMapping("/add")
     public ResponseEntity<String> addFood(@RequestBody Food food,
                                           @RequestParam Long categoryId,
@@ -46,21 +49,16 @@ public class FoodController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Update Food Availability
+    // ✅ Admin & Owner can update food
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     @PutMapping("/update/{foodId}")
     public ResponseEntity<String> updateFood(@PathVariable Long foodId) {
         String response = foodService.updateFood(foodId);
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Delete Food
-    @DeleteMapping("/delete/{foodId}")
-    public ResponseEntity<String> deleteFood(@PathVariable Long foodId) {
-        String response = foodService.deleteFood(foodId);
-        return ResponseEntity.ok(response);
-    }
-
-    // ✅ Get All Foods by Restaurant with Filters
+    // ✅ Admin & User can get all foods by restaurant
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/restaurant/{restaurantId}")
     public ResponseEntity<List<Food>> getAllRestaurantFoods(
             @PathVariable Long restaurantId,
@@ -72,17 +70,25 @@ public class FoodController {
         return ResponseEntity.ok(foods);
     }
 
-    // ✅ Search Food by Keyword
+    // ✅ Search Food (No restrictions, available for all authenticated users)
     @GetMapping("/search")
     public ResponseEntity<List<Food>> searchFood(@RequestParam String keyword) {
         List<Food> foods = foodService.searchFood(keyword);
         return ResponseEntity.ok(foods);
     }
 
-    // ✅ Get Food by ID
+    // ✅ Get Food by ID (No restrictions, available for all authenticated users)
     @GetMapping("/{foodId}")
     public ResponseEntity<Food> getFoodById(@PathVariable Long foodId) {
         Food food = foodService.findFoodById(foodId);
         return ResponseEntity.ok(food);
+    }
+
+    // ✅ Admin can delete food
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/delete/{foodId}")
+    public ResponseEntity<String> deleteFood(@PathVariable Long foodId) {
+        String response = foodService.deleteFood(foodId);
+        return ResponseEntity.ok(response);
     }
 }
