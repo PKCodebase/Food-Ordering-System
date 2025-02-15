@@ -16,9 +16,9 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //Multiple Address is associated with one User.
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false) // Ensure this column is set correctly
     private User user;
 
     private String street;
@@ -27,7 +27,6 @@ public class Address {
     private String postalCode;
     private String country;
 
-    //One address can be associated with  one user
     @JsonIgnore
     @OneToOne(mappedBy = "address", cascade = CascadeType.ALL, orphanRemoval = true)
     private Restaurant restaurant;

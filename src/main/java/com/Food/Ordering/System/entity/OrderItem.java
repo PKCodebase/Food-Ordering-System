@@ -1,11 +1,10 @@
 package com.Food.Ordering.System.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,18 +15,17 @@ public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private int quantity;
-
-    private Long totalPrice;
-
-    private List<String> ingredients;
+    private Long price;
 
     @ManyToOne
-    @JoinColumn(name ="food_id")
+    @JoinColumn(name = "food_id")
     private Food food;
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name= "order_id")
+    @JoinColumn(name = "order_id")
     private Order order;
 
     public Long getId() {
@@ -46,20 +44,12 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public Long getTotalPrice() {
-        return totalPrice;
+    public Long getPrice() {
+        return price;
     }
 
-    public void setTotalPrice(Long totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public List<String> getIngredients() {
-        return ingredients;
-    }
-
-    public void setIngredients(List<String> ingredients) {
-        this.ingredients = ingredients;
+    public void setPrice(Long price) {
+        this.price = price;
     }
 
     public Food getFood() {

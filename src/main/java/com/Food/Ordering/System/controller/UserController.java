@@ -64,11 +64,11 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUserById(@PathVariable Long id) throws UserNotFoundException {
-        User userOptional = userService.getUserById(id);
         User user = userService.getUserById(id);
         if (user == null) {
             throw new UserNotFoundException("User not found with ID: " + id);
         }
+        userService.deleteUserById(id);
         return ResponseEntity.ok("User deleted successfully");
     }
 }

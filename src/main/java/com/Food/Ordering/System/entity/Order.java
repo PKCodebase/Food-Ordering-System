@@ -29,10 +29,9 @@ public class Order {
     private Restaurant restaurant;
 
     private Long totalAmount;
-
-    private String orderStatus;
-
     private Date createdAt;
+    private int totalItem;
+    private Long totalPrice;
 
     @ManyToOne
     @JoinColumn(name= "address_id")
@@ -40,10 +39,6 @@ public class Order {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "order")
     private List<OrderItem> orderItems;
-
-    private int totalItem;
-
-    private Long totalPrice;
 
     public Long getId() {
         return id;
@@ -77,13 +72,6 @@ public class Order {
         this.totalAmount = totalAmount;
     }
 
-    public String getOrderStatus() {
-        return orderStatus;
-    }
-
-    public void setOrderStatus(String orderStatus) {
-        this.orderStatus = orderStatus;
-    }
 
     public Date getCreatedAt() {
         return createdAt;
@@ -91,22 +79,6 @@ public class Order {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public Address getDeliveryAddress() {
-        return deliveryAddress;
-    }
-
-    public void setDeliveryAddress(Address deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
-    }
-
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
-    }
-
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
     }
 
     public int getTotalItem() {
@@ -123,5 +95,21 @@ public class Order {
 
     public void setTotalPrice(Long totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public Address getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(Address deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }

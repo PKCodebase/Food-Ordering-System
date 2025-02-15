@@ -1,7 +1,8 @@
 package com.Food.Ordering.System.entity;
 
-
+import com.Food.Ordering.System.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -34,25 +35,24 @@ public class User {
     private String phone;
 
     @NotBlank(message = "Password cannot be blank")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-            message = "Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character")
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    private String role;
-
-    // One user can have many orders
-    @JsonIgnore
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
 
-    // One user can own multiple restaurants
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Restaurant> restaurants;
-
-    // One user can have many addresses
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses;
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Restaurant> ownedRestaurants;
 
     public Long getId() {
         return id;
@@ -94,11 +94,11 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -110,19 +110,27 @@ public class User {
         this.orders = orders;
     }
 
-    public List<Restaurant> getRestaurants() {
-        return restaurants;
-    }
-
-    public void setRestaurants(List<Restaurant> restaurants) {
-        this.restaurants = restaurants;
-    }
-
     public List<Address> getAddresses() {
         return addresses;
     }
 
     public void setAddresses(List<Address> addresses) {
         this.addresses = addresses;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    public List<Restaurant> getOwnedRestaurants() {
+        return ownedRestaurants;
+    }
+
+    public void setOwnedRestaurants(List<Restaurant> ownedRestaurants) {
+        this.ownedRestaurants = ownedRestaurants;
     }
 }

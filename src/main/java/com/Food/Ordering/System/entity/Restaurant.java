@@ -1,5 +1,6 @@
 package com.Food.Ordering.System.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,40 +31,40 @@ public class Restaurant {
 
     private LocalDateTime registrationDate;
 
-    private boolean open=false;
+    private boolean open = false;
 
-    //Each restaurant can have many orders.
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Order> orders;
-
-    //Many restaurants can be owned by one user.
+    @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = true,referencedColumnName = "id")
+    @JoinColumn(name = "owner_id")
     private User owner;
 
-    //Each restaurant has exactly one address.
+
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address address;
 
+
+
     @Embedded
     private ContactInformation contactInformation;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders;
 
-    //Each restaurant can offer multiple food items
     @JsonIgnore
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Food> foods;
 
-    //Each restaurant  have multiple IngredientsItem
+    @JsonIgnore
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IngredientsItem> ingredientsItems;
 
-    //Each restaurant  have multiple IngredientsCategory
+    @JsonIgnore
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IngredientCategory> ingredientCategories;
 
-    //Each restaurant have multiple categories
+    @JsonIgnore
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categories;
 
@@ -123,14 +124,6 @@ public class Restaurant {
         this.open = open;
     }
 
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
-
     public User getOwner() {
         return owner;
     }
@@ -153,6 +146,14 @@ public class Restaurant {
 
     public void setContactInformation(ContactInformation contactInformation) {
         this.contactInformation = contactInformation;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     public List<Food> getFoods() {

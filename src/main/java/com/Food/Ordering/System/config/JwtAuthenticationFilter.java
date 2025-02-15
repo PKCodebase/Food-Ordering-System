@@ -1,10 +1,8 @@
 package com.Food.Ordering.System.config;
 
-
 import com.Food.Ordering.System.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,13 +19,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
-    private  JwtUtil jwtUtil;
-
-
+    private JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -46,8 +41,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String username = jwtUtil.extractUsername(token);
             String role = jwtUtil.extractRole(token);
 
+            // 🔹 Debugging
+            System.out.println("Extracted Username: " + username);
+            System.out.println("Extracted Role from Token: " + role);
+
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = User.withUsername(username).password("").roles(role.replace("ROLE_", "")).build();
+                // Ensure roles are prefixed with "ROLE_"
+                String roleWithPrefix = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+
+                UserDetails userDetails = User.withUsername(username)
+                        .password("")
+                        .authorities(roleWithPrefix)
+                        .build();
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 

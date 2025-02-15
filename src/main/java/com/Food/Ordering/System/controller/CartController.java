@@ -32,9 +32,9 @@ public class CartController {
             String email = jwtUtil.extractUsername(jwt);
             CartItem item = cartService.addProductToCart(cartItem, email);
             return new ResponseEntity<>(item, HttpStatus.CREATED);
-        } catch (CartNotFoundException | CartItemNotFoundException ex) {
+        } catch (UserNotFoundException | CartNotFoundException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (Exception | UserNotFoundException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>("Something went wrong while adding the product to the cart.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -62,11 +62,11 @@ public class CartController {
             @RequestHeader("Authorization") String jwt) {
 
         try {
-            Cart cart = cartService.removeProductToCart(productId, jwt);
+            Cart cart = cartService.removeProductFromCart(productId, jwt);
             return new ResponseEntity<>(cart, HttpStatus.OK);
-        } catch (CartNotFoundException | CartItemNotFoundException ex) {
+        } catch (CartNotFoundException | CartItemNotFoundException | UserNotFoundException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (Exception | UserNotFoundException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>("Error removing product from cart.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -88,8 +88,7 @@ public class CartController {
     @GetMapping("/total/{cartId}")
     public ResponseEntity<?> calculateTotalPrice(@PathVariable Long cartId) {
         try {
-            Cart cart = cartService.findCartById(cartId);
-            Long totalPrice = cartService.calculateCartTotals(cart);
+            Long totalPrice = cartService.calculateCartTotals(cartId);
             return new ResponseEntity<>(totalPrice, HttpStatus.OK);
         } catch (CartNotFoundException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
@@ -97,6 +96,7 @@ public class CartController {
             return new ResponseEntity<>("Error calculating total price.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     // Get Cart by User ID
     @GetMapping("/user/{userId}")

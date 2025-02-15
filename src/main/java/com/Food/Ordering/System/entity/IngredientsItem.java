@@ -1,11 +1,10 @@
 package com.Food.Ordering.System.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,20 +17,17 @@ public class IngredientsItem {
     private Long id;
 
     private String name;
-
-    @ManyToMany(mappedBy = "ingredientsItems")
-    private List<Food> foods;
-
-    @ManyToOne
-    @JoinColumn(name = "restaurant_id")
-    private Restaurant restaurant;
+    private Long price;
+    private boolean available;
 
     @ManyToOne
     @JoinColumn(name = "ingredient_category_id")
     private IngredientCategory ingredientCategory;
 
-    @Column(name = "in_stock", nullable = false)
-    private boolean inStock = false;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
 
     public Long getId() {
         return id;
@@ -49,20 +45,20 @@ public class IngredientsItem {
         this.name = name;
     }
 
-    public List<Food> getFoods() {
-        return foods;
+    public Long getPrice() {
+        return price;
     }
 
-    public void setFoods(List<Food> foods) {
-        this.foods = foods;
+    public void setPrice(Long price) {
+        this.price = price;
     }
 
-    public Restaurant getRestaurant() {
-        return restaurant;
+    public boolean isAvailable() {
+        return available;
     }
 
-    public void setRestaurant(Restaurant restaurant) {
-        this.restaurant = restaurant;
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 
     public IngredientCategory getIngredientCategory() {
@@ -73,11 +69,11 @@ public class IngredientsItem {
         this.ingredientCategory = ingredientCategory;
     }
 
-    public boolean isInStock() {
-        return inStock;
+    public Restaurant getRestaurant() {
+        return restaurant;
     }
 
-    public void setInStock(boolean inStock) {
-        this.inStock = inStock;
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 }

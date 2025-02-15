@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,9 +22,6 @@ public class IngredientCategory {
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "ingredientCategory")
-    private List<IngredientsItem> ingredientsItems;
 
     public Long getId() {
         return id;
@@ -50,13 +45,5 @@ public class IngredientCategory {
 
     public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
-    }
-
-    public List<IngredientsItem> getIngredientsItems() {
-        return ingredientsItems;
-    }
-
-    public void setIngredientsItems(List<IngredientsItem> ingredientsItems) {
-        this.ingredientsItems = ingredientsItems;
     }
 }

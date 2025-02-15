@@ -57,7 +57,7 @@ public class IngredientsServiceImpl implements IngredientsService {
         ingredientsItem.setName(ingredientName);
         ingredientsItem.setRestaurant(restaurantService.getRestaurantById(restaurantId));
         ingredientsItem.setIngredientCategory(ingredientCategory);
-        ingredientsItem.setInStock(false);
+        ingredientsItem.setAvailable(false);
         ingredientsItemRepository.save(ingredientsItem);
         return "Ingredient item added successfully";
     }
@@ -69,7 +69,7 @@ public class IngredientsServiceImpl implements IngredientsService {
                 .orElseThrow(() -> new RuntimeException("Ingredient Item Not Found"));
 
         // Toggle the inStock status
-        ingredientsItem.setInStock(!ingredientsItem.isInStock());
+        ingredientsItem.setAvailable(!ingredientsItem.isAvailable());
 
         // Save and return the updated item
         return ingredientsItemRepository.save(ingredientsItem);

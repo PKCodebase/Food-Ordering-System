@@ -12,9 +12,9 @@ public interface CartService {
 
     CartItem updateCart(Long cartItemId, int quantity) throws CartNotFoundException;
 
-    Cart removeProductToCart(Long productId, String jwt) throws CartNotFoundException, UserNotFoundException;
+    Cart removeProductFromCart(Long productId, String jwt) throws CartNotFoundException, UserNotFoundException;
 
-    Long calculateCartTotals(Cart id) throws CartNotFoundException;
+    Long calculateCartTotals(Long cartId) throws CartNotFoundException;
 
     public Cart findCartById(Long id) throws Exception, CartNotFoundException;
 

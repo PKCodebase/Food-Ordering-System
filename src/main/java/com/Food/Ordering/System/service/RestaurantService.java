@@ -1,22 +1,23 @@
 package com.Food.Ordering.System.service;
 
-import com.Food.Ordering.System.entity.Category;
 import com.Food.Ordering.System.entity.Restaurant;
+import com.Food.Ordering.System.exception.UserNotFoundException;
 
 import java.util.List;
 
 public interface RestaurantService {
 
-    String addRestaurant(Restaurant restaurant);
+    String addRestaurant(Restaurant restaurant,Long ownerId);
 
-    Restaurant getRestaurantById(Long restid);
+    Restaurant getRestaurantById(Long restId);
 
     String updateRestaurantById(Long id, Restaurant restaurant);
 
-    String deleteRestaurantById(Long id);
+    String deleteRestaurant(Long id) throws UserNotFoundException;
 
     List<Restaurant> getAllRestaurant();
 
     List<Restaurant> searchRestaurant(String keyword);
 
+    List<Restaurant> findRestaurantByOwnerId(Long id);
 }

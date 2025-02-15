@@ -24,10 +24,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
-//    @Autowired
-//    private AuthRepository authRepository;
-
-
     @Autowired
     private AddressRepository addressRepository;
 
@@ -51,9 +47,9 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // Get the restaurant based on the order
-        Restaurant restaurant = restaurantService.getRestaurantById(order.getId());
+        Restaurant restaurant = restaurantService.getRestaurantById(order.getRestaurant().getId());
         if (restaurant == null) {
-            throw new RestaurantNotFoundException("Restaurant not found: ");
+            throw new RestaurantNotFoundException("Restaurant not found");
         }
 
         // Create the order object
@@ -61,31 +57,40 @@ public class OrderServiceImpl implements OrderService {
         createOrder.setCustomer(user);
         createOrder.setRestaurant(restaurant);
         createOrder.setDeliveryAddress(savedAddress);
-        createOrder.setOrderStatus("PENDING");
         createOrder.setCreatedAt(new Date());
 
+        // Get user's cart
+        Cart cart = cartService.findCartByUserId(user.getId());
+        if (cart == null) {
+            throw new CartNotFoundException("No cart found for user ID: " + user.getId());
+        }
+
         // Generate order items based on the user's cart
-          Cart cart = cartService.findCartById(user.getId());
         List<OrderItem> orderItems = new ArrayList<>();
         for (CartItem cartItem : cart.getCartItems()) {
             OrderItem orderItem = new OrderItem();
             orderItem.setFood(cartItem.getFood());
-            orderItem.setIngredients(cartItem.getIngredients());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setTotalPrice(cartItem.getTotalPrice());
+            orderItem.setPrice(cartItem.getPrice());
 
             OrderItem savedOrderItem = orderItemRepository.save(orderItem);
             orderItems.add(savedOrderItem);
         }
 
         // Calculate total price
-        Long totalPrice = cartService.calculateCartTotals(cart);
+        Long totalPrice = cartService.calculateCartTotals(cart.getId());
         createOrder.setTotalPrice(totalPrice);
         createOrder.setOrderItems(orderItems);
 
         // Save the order
         Order savedOrder = orderRepository.save(createOrder);
+
+        // Ensure restaurant orders list is not null before adding
+        if (restaurant.getOrders() == null) {
+            restaurant.setOrders(new ArrayList<>());
+        }
         restaurant.getOrders().add(savedOrder);
+
         return "Order created successfully";
     }
 
@@ -93,7 +98,6 @@ public class OrderServiceImpl implements OrderService {
     public String updateOrderStatus(Long orderId, String orderStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
-        order.setOrderStatus(orderStatus);
         orderRepository.save(order);
         return "Order status updated successfully";
     }
@@ -102,7 +106,6 @@ public class OrderServiceImpl implements OrderService {
     public String cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
-        order.setOrderStatus("CANCELED");
         orderRepository.save(order);
         return "Order canceled successfully";
     }

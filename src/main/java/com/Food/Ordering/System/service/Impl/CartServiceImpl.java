@@ -4,10 +4,7 @@ import com.Food.Ordering.System.entity.Cart;
 import com.Food.Ordering.System.entity.CartItem;
 import com.Food.Ordering.System.entity.Food;
 import com.Food.Ordering.System.entity.User;
-import com.Food.Ordering.System.exception.CartNotFoundException;
-import com.Food.Ordering.System.exception.CartItemNotFoundException;
-import com.Food.Ordering.System.exception.FoodNotFoundException;
-import com.Food.Ordering.System.exception.UserNotFoundException;
+import com.Food.Ordering.System.exception.*;
 import com.Food.Ordering.System.repository.CartItemRepository;
 import com.Food.Ordering.System.repository.CartRepository;
 import com.Food.Ordering.System.service.CartService;
@@ -16,10 +13,12 @@ import com.Food.Ordering.System.service.UserService;
 import com.Food.Ordering.System.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional
 public class CartServiceImpl implements CartService {
 
     @Autowired
@@ -49,16 +48,17 @@ public class CartServiceImpl implements CartService {
             throw new FoodNotFoundException("Food item not found with ID: " + cartItemDto.getFood().getId());
         }
 
-        Cart cart = cartRepository.findByCustomerId(user.getId());
-        if (cart == null) {
-            throw new CartNotFoundException("Cart not found for user: " + email);
-        }
+        Cart cart = cartRepository.findByCustomerId(user.getId()).orElseGet(() -> {
+            Cart newCart = new Cart();
+            newCart.setCustomer(user);
+            return cartRepository.save(newCart);
+        });
 
         for (CartItem cartItem : cart.getCartItems()) {
-            if (cartItem.getFood().equals(food)) {
+            if (cartItem.getFood().getId().equals(food.getId())) {
                 int newQuantity = cartItem.getQuantity() + cartItemDto.getQuantity();
                 cartItem.setQuantity(newQuantity);
-                cartItem.setTotalPrice(cartItem.getFood().getPrice() * newQuantity);
+                cartItem.setPrice(cartItem.getFood().getPrice() * newQuantity);
                 return cartItemRepository.save(cartItem);
             }
         }
@@ -66,38 +66,40 @@ public class CartServiceImpl implements CartService {
         CartItem newCartItem = new CartItem();
         newCartItem.setFood(food);
         newCartItem.setQuantity(cartItemDto.getQuantity());
-        newCartItem.setIngredients(cartItemDto.getIngredients());
-        newCartItem.setTotalPrice(cartItemDto.getQuantity() * food.getPrice());
+        newCartItem.setPrice(cartItemDto.getQuantity() * food.getPrice());
         newCartItem.setCart(cart);
 
         return cartItemRepository.save(newCartItem);
     }
 
     @Override
-    public CartItem updateCart(Long cartItemId, int quantity) throws CartNotFoundException {
+    public CartItem updateCart(Long cartItemId, int quantity) throws CartItemNotFoundException {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new CartItemNotFoundException("No item found in your cart with ID: " + cartItemId));
 
+        if (quantity <= 0) {
+            cartItemRepository.delete(cartItem);
+            return null;
+        }
+
         cartItem.setQuantity(quantity);
-        cartItem.setTotalPrice(cartItem.getFood().getPrice() * quantity);
+        cartItem.setPrice(cartItem.getFood().getPrice() * quantity);
         return cartItemRepository.save(cartItem);
     }
 
     @Override
-    public Cart removeProductToCart(Long productId, String jwt) throws CartNotFoundException, UserNotFoundException {
+    public Cart removeProductFromCart(Long cartItemId, String jwt) throws CartNotFoundException, UserNotFoundException {
         String email = jwtUtil.extractUsername(jwt);
         User user = userService.getUserByEmail(email);
         if (user == null) {
             throw new UserNotFoundException("User not found with email: " + email);
         }
 
-        Cart cart = cartRepository.findByCustomerId(user.getId());
-        if (cart == null) {
-            throw new CartNotFoundException("Cart not found for user: " + email);
-        }
+        Cart cart = cartRepository.findByCustomerId(user.getId())
+                .orElseThrow(() -> new CartNotFoundException("Cart not found for user: " + email));
 
-        CartItem cartItem = cartItemRepository.findById(productId)
-                .orElseThrow(() -> new CartItemNotFoundException("Cart item not found with ID: " + productId));
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new CartItemNotFoundException("Cart item not found with ID: " + cartItemId));
 
         cart.getCartItems().remove(cartItem);
         cartItemRepository.delete(cartItem);
@@ -105,8 +107,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Long calculateCartTotals(Cart cartId) throws CartNotFoundException {
-        Cart cart = cartRepository.findById(cartId.getId())
+    public Long calculateCartTotals(Long cartId) throws CartNotFoundException {
+        Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new CartNotFoundException("No items in your cart"));
 
         return cart.getCartItems().stream()
@@ -122,19 +124,15 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart findCartByUserId(Long userId) throws CartNotFoundException {
-        Cart cart = cartRepository.findByCustomerId(userId);
-        if (cart == null) {
-            throw new CartNotFoundException("Cart not found for user ID: " + userId);
-        }
-        return cart;
+        return cartRepository.findByCustomerId(userId)
+                .orElseThrow(() -> new CartNotFoundException("Cart not found for user ID: " + userId));
     }
 
     @Override
     public Cart clearCart(Long userId) throws CartNotFoundException {
-        Cart cart = cartRepository.findByCustomerId(userId);
-        if (cart == null) {
-            throw new CartNotFoundException("Cart not found for user ID: " + userId);
-        }
+        Cart cart = cartRepository.findByCustomerId(userId)
+                .orElseThrow(() -> new CartNotFoundException("No any item in your cart: " + userId));
+
         cart.getCartItems().clear();
         return cartRepository.save(cart);
     }

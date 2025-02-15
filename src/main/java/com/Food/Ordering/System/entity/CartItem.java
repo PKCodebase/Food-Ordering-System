@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,20 +16,16 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
+    private int quantity;
+    private Long price;
+
     @ManyToOne
-    @JoinColumn(name= "cart_id")
+    @JoinColumn(name = "cart_id")
     private Cart cart;
 
     @ManyToOne
     @JoinColumn(name = "food_id")
     private Food food;
-
-    private int quantity;
-
-    private Long totalPrice;
-
-    private List<String> ingredients;
 
     public Long getId() {
         return id;
@@ -39,6 +33,22 @@ public class CartItem {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
     }
 
     public Cart getCart() {
@@ -55,29 +65,5 @@ public class CartItem {
 
     public void setFood(Food food) {
         this.food = food;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public Long getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(Long totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public List<String> getIngredients() {
-        return ingredients;
-    }
-
-    public void setIngredients(List<String> ingredients) {
-        this.ingredients = ingredients;
     }
 }
