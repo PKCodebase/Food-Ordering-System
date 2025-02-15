@@ -49,13 +49,7 @@ public class FoodController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Admin & Owner can update food
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
-    @PutMapping("/update/{foodId}")
-    public ResponseEntity<String> updateFood(@PathVariable Long foodId) {
-        String response = foodService.updateFood(foodId);
-        return ResponseEntity.ok(response);
-    }
+
 
     // ✅ Admin & User can get all foods by restaurant
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
@@ -85,7 +79,13 @@ public class FoodController {
     }
 
     // ✅ Admin can delete food
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
+    @PutMapping("/update/{foodId}")
+    public ResponseEntity<String> updateFood(@PathVariable Long foodId, @RequestBody Food updatedFood) {
+        String response = foodService.updateFood(foodId, updatedFood);
+        return ResponseEntity.ok(response);
+    }
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     @DeleteMapping("/delete/{foodId}")
     public ResponseEntity<String> deleteFood(@PathVariable Long foodId) {
         String response = foodService.deleteFood(foodId);

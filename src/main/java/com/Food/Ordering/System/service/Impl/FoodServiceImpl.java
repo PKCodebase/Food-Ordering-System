@@ -30,17 +30,21 @@ public class FoodServiceImpl implements FoodService {
         return "Food added successfully";
     }
     @Override
-    public String updateFood(Long foodId) {
-        Optional<Food> optionalFood = foodRepository.findById(foodId);
-        if (!optionalFood.isPresent()) {
-            throw new FoodNotFoundException("Food not found with ID: " + foodId);
-        }
+    public String updateFood(Long foodId, Food updatedFood) {
+        Food food = foodRepository.findById(foodId)
+                .orElseThrow(() -> new FoodNotFoundException("Food not found with ID: " + foodId));
 
-        Food food = optionalFood.get();
-        food.setAvailable(true);
+        food.setName(updatedFood.getName());
+        food.setDescription(updatedFood.getDescription());
+        food.setPrice(updatedFood.getPrice());
+        food.setAvailable(updatedFood.isAvailable());
+        food.setVegetarian(updatedFood.isVegetarian());
+        food.setSeasonal(updatedFood.isSeasonal());
+
         foodRepository.save(food);
-        return "Food availability updated successfully";
+        return "Food updated successfully";
     }
+
 //    private List<IngredientsItem> getIngredientsFromIds(List<Long> ingredientIds) {
 //        // Fetch IngredientsItem entities by their IDs and return as a list
 //        return ingredientsItemRepository.findAllById(ingredientIds);

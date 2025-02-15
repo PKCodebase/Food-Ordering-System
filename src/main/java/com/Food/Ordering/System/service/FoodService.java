@@ -11,7 +11,7 @@ public interface FoodService {
 
     String addFood(Food foodD, Category category, Restaurant restaurant);
 
-    String updateFood(Long foodId);
+    String updateFood(Long foodId, Food updatedFood);
 
     String deleteFood(Long foodId);
 
