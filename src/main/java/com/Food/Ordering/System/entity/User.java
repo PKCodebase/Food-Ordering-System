@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -46,7 +47,7 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Address> addresses;
+    private List<Address> addresses =new ArrayList<>();
 
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference

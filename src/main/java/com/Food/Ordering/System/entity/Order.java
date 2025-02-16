@@ -23,15 +23,16 @@ public class Order {
     @JoinColumn(name = "customer_id", nullable = false)
     private User customer;
 
-    @JsonIgnore
+
     @ManyToOne
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id",nullable = false)
     private Restaurant restaurant;
 
     private Long totalAmount;
     private Date createdAt;
     private int totalItem;
-    private Long totalPrice;
+    private Double totalPrice;
+    private String orderStatus;
 
     @ManyToOne
     @JoinColumn(name= "address_id")
@@ -72,7 +73,6 @@ public class Order {
         this.totalAmount = totalAmount;
     }
 
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -89,12 +89,20 @@ public class Order {
         this.totalItem = totalItem;
     }
 
-    public Long getTotalPrice() {
+    public Double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Long totalPrice) {
+    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     public Address getDeliveryAddress() {

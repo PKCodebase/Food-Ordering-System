@@ -96,20 +96,30 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Long calculateCartTotal(Long userId) throws CartNotFoundException {
+    public Double calculateCartTotal(Long userId) throws CartNotFoundException {
         Cart cart = cartRepository.findByCustomer_Id(userId)
                 .orElseThrow(() -> new CartNotFoundException("Cart not found"));
 
-        return cart.getCartItems().stream()
+        return (double) cart.getCartItems().stream()
                 .mapToLong(item -> item.getFood().getPrice() * item.getQuantity())
                 .sum();
     }
 
     @Override
-    public Cart getCart(Long userId) throws UserNotFoundException, CartNotFoundException {
+    public Cart getCart(Long userId) {
         return cartRepository.findByCustomer_Id(userId)
-                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    try {
+                        newCart.setCustomer(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found")));
+                    } catch (UserNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    newCart.setPrice(0.0);
+                    return cartRepository.save(newCart);
+                });
     }
+
 
     @Override
     public Cart clearCart(Long userId) throws CartNotFoundException {

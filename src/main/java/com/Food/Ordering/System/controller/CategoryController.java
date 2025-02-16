@@ -20,7 +20,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    // ✅ Add Category (Only Admin & Owner)
+    // Add Category (Only Admin & Owner)
     @PostMapping("/add")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<String> addCategory(@RequestParam String name, @RequestParam Long restaurantId) {
@@ -28,7 +28,7 @@ public class CategoryController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // ✅ Delete a Category (Only Admin & Owner)
+    // Delete a Category (Only Admin & Owner)
     @DeleteMapping("/delete/{categoryId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId,
@@ -42,7 +42,7 @@ public class CategoryController {
     }
 
 
-    // ✅ Update a Category (Only Admin & Owner)
+    //  Update a Category (Only Admin & Owner)
     @PutMapping("/update/{categoryId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<String> updateCategory(@PathVariable Long categoryId, @RequestParam String name) {
@@ -54,7 +54,7 @@ public class CategoryController {
         }
     }
 
-    // ✅ Find Categories by Restaurant ID (Admin & Owner)
+    //  Find Categories by Restaurant ID (Admin & Owner)
     @GetMapping("/restaurant/{restaurantId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> findCategoriesByRestaurantId(@PathVariable Long restaurantId) {
@@ -66,7 +66,7 @@ public class CategoryController {
         }
     }
 
-    // ✅ Find Category by ID (All Users)
+    // Find Category by ID (All Users)
     @GetMapping("/{categoryId}")
     public ResponseEntity<?> findCategoryById(@PathVariable Long categoryId) {
         try {

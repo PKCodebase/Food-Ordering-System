@@ -19,7 +19,7 @@ public class IngredientsController {
     @Autowired
     private IngredientsService ingredientsService;
 
-    // ✅ Add Ingredient Category
+
     @PostMapping("/category/add")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<String> addIngredientCategory(@RequestParam String name, @RequestParam Long restaurantId) {
@@ -31,7 +31,7 @@ public class IngredientsController {
         }
     }
 
-    // ✅ Get all ingredient categories for a restaurant
+
     @GetMapping("/category/restaurant/{restaurantId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<List<IngredientCategory>> getIngredientsByRestaurant(@PathVariable Long restaurantId) {
@@ -39,14 +39,14 @@ public class IngredientsController {
         return new ResponseEntity<>(ingredientCategories, HttpStatus.OK);
     }
 
-    // ✅ Get a specific ingredient category by ID
+
     @GetMapping("/get/category/{id}")
     public ResponseEntity<IngredientCategory> getIngredientCategoryById(@PathVariable Long id) {
         IngredientCategory ingredientCategory = ingredientsService.findIngredientCategoryById(id);
         return new ResponseEntity<>(ingredientCategory, HttpStatus.OK);
     }
 
-    // ✅ Create a new ingredient item
+
     @PostMapping("/item/add")
     public ResponseEntity<String> createIngredientItem(
             @RequestParam Long restaurantId,
@@ -61,7 +61,7 @@ public class IngredientsController {
         }
     }
 
-    // ✅ Update Ingredient Stock and Price
+
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<IngredientsItem> updateIngredientStock(

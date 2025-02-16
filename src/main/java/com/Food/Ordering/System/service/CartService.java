@@ -15,7 +15,7 @@ public interface CartService {
 
     Cart removeProductFromCart(Long userId, Long foodId) throws CartNotFoundException, UserNotFoundException;
 
-    Long calculateCartTotal(Long userId) throws CartNotFoundException;
+    Double calculateCartTotal(Long userId) throws CartNotFoundException;
 
     Cart getCart(Long userId) throws UserNotFoundException, CartNotFoundException;
 

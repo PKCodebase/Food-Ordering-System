@@ -29,7 +29,7 @@ public class FoodController {
     @Autowired
     private RestaurantService restaurantService;
 
-    // ✅ Admin & Owner can add food
+    //Admin & Owner can add food
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     @PostMapping("/add")
     public ResponseEntity<String> addFood(@RequestBody Food food,
@@ -51,7 +51,7 @@ public class FoodController {
 
 
 
-    // ✅ Admin & User can get all foods by restaurant
+    //  Admin & User can get all foods by restaurant
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/restaurant/{restaurantId}")
     public ResponseEntity<List<Food>> getAllRestaurantFoods(
@@ -64,21 +64,21 @@ public class FoodController {
         return ResponseEntity.ok(foods);
     }
 
-    // ✅ Search Food (No restrictions, available for all authenticated users)
+    //  Search Food (No restrictions, available for all authenticated users)
     @GetMapping("/search")
     public ResponseEntity<List<Food>> searchFood(@RequestParam String keyword) {
         List<Food> foods = foodService.searchFood(keyword);
         return ResponseEntity.ok(foods);
     }
 
-    // ✅ Get Food by ID (No restrictions, available for all authenticated users)
+    //  Get Food by ID (No restrictions, available for all authenticated users)
     @GetMapping("/{foodId}")
     public ResponseEntity<Food> getFoodById(@PathVariable Long foodId) {
         Food food = foodService.findFoodById(foodId);
         return ResponseEntity.ok(food);
     }
 
-    // ✅ Admin can delete food
+    // Admin can delete food
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')")
     @PutMapping("/update/{foodId}")
     public ResponseEntity<String> updateFood(@PathVariable Long foodId, @RequestBody Food updatedFood) {

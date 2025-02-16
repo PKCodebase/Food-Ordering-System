@@ -3,7 +3,7 @@ package com.Food.Ordering.System.service.Impl;
 import com.Food.Ordering.System.entity.*;
 import com.Food.Ordering.System.exception.CartNotFoundException;
 import com.Food.Ordering.System.exception.OrderNotFoundException;
-import com.Food.Ordering.System.exception.RestaurantNotFoundException;
+import com.Food.Ordering.System.exception.UserNotFoundException;
 import com.Food.Ordering.System.repository.*;
 import com.Food.Ordering.System.service.CartService;
 import com.Food.Ordering.System.service.OrderService;
@@ -11,9 +11,10 @@ import com.Food.Ordering.System.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -37,100 +38,96 @@ public class OrderServiceImpl implements OrderService {
     private CartService cartService;
 
     @Override
-    public String createOrder(Order order, User user) throws Exception, CartNotFoundException {
-        // Save the delivery address if not already in user's address list
-        Address shippingAddress = order.getDeliveryAddress();
-        Address savedAddress = addressRepository.save(shippingAddress);
+    public String createOrder(Order order, User user) throws Exception, UserNotFoundException, CartNotFoundException {
+        if (user == null || user.getId() == null) {
+            throw new UserNotFoundException("User not found.");
+        }
+
+        if (order.getDeliveryAddress() == null) {
+            throw new IllegalArgumentException("Delivery address is required.");
+        }
+
+
+        Long restaurantId = order.getRestaurant().getId();
+        if (restaurantId == null) {
+            throw new IllegalArgumentException("Restaurant ID is required.");
+        }
+        Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+
+        // Save address
+        Address deliveryAddress = order.getDeliveryAddress();
+        deliveryAddress.setUser(user);
+        Address savedAddress = addressRepository.save(deliveryAddress);
+
         if (!user.getAddresses().contains(savedAddress)) {
             user.getAddresses().add(savedAddress);
             userRepository.save(user);
         }
 
-        // Get the restaurant based on the order
-        Restaurant restaurant = restaurantService.getRestaurantById(order.getRestaurant().getId());
-        if (restaurant == null) {
-            throw new RestaurantNotFoundException("Restaurant not found");
-        }
 
-        // Create the order object
-        Order createOrder = new Order();
-        createOrder.setCustomer(user);
-        createOrder.setRestaurant(restaurant);
-        createOrder.setDeliveryAddress(savedAddress);
-        createOrder.setCreatedAt(new Date());
+        Order createdOrder = new Order();
+        createdOrder.setCustomer(user);
+        createdOrder.setCreatedAt(new Date());
+        createdOrder.setOrderStatus("PENDING");
+        createdOrder.setDeliveryAddress(savedAddress);
+        createdOrder.setRestaurant(restaurant);
 
-        // Get user's cart
-        Cart cart = cartService.findCartByUserId(user.getId());
-        if (cart == null) {
-            throw new CartNotFoundException("No cart found for user ID: " + user.getId());
-        }
 
-        // Generate order items based on the user's cart
-        List<OrderItem> orderItems = new ArrayList<>();
-        for (CartItem cartItem : cart.getCartItems()) {
+        Cart cart = cartService.getCart(user.getId());
+
+        List<OrderItem> orderItems = cart.getCartItems().stream().map(cartItem -> {
             OrderItem orderItem = new OrderItem();
             orderItem.setFood(cartItem.getFood());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(cartItem.getPrice());
+            orderItem.setPrice(cartItem.getTotalPrice());
+            return orderItemRepository.save(orderItem);
+        }).collect(Collectors.toList());
 
-            OrderItem savedOrderItem = orderItemRepository.save(orderItem);
-            orderItems.add(savedOrderItem);
-        }
+        createdOrder.setOrderItems(orderItems);
+        createdOrder.setTotalPrice(cartService.calculateCartTotal(cart.getId()));
 
-        // Calculate total price
-        Long totalPrice = cartService.calculateCartTotals(cart.getId());
-        createOrder.setTotalPrice(totalPrice);
-        createOrder.setOrderItems(orderItems);
-
-        // Save the order
-        Order savedOrder = orderRepository.save(createOrder);
-
-        // Ensure restaurant orders list is not null before adding
-        if (restaurant.getOrders() == null) {
-            restaurant.setOrders(new ArrayList<>());
-        }
-        restaurant.getOrders().add(savedOrder);
-
-        return "Order created successfully";
+        orderRepository.save(createdOrder);
+        return "Order successfully created with ID: " + createdOrder.getId();
     }
 
     @Override
-    public String updateOrderStatus(Long orderId, String orderStatus) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
+    public String updateOrder(Long orderId, String orderStatus) {
+        Order order = findOrderById(orderId);
+
+        // Validate order status
+        if (!List.of("OUT_FOR_DELIVERY", "DELIVERED", "COMPLETED", "PENDING").contains(orderStatus)) {
+            throw new IllegalArgumentException("Invalid order status. Allowed values: PENDING, OUT_FOR_DELIVERY, DELIVERED, COMPLETED.");
+        }
+
+        order.setOrderStatus(orderStatus);
         orderRepository.save(order);
-        return "Order status updated successfully";
+        return "Order status updated to: " + orderStatus;
     }
 
     @Override
     public String cancelOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
-        orderRepository.save(order);
-        return "Order canceled successfully";
+        Order order = findOrderById(orderId);
+        orderRepository.deleteById(orderId);
+        return "Order with ID " + orderId + " has been canceled.";
     }
 
     @Override
     public List<Order> getUsersOrders(Long userId) {
-        List<Order> orders = orderRepository.findByCustomerId(userId);
-        if (orders.isEmpty()) {
-            throw new OrderNotFoundException("No orders found for user ID: " + userId);
-        }
-        return orders;
+        return orderRepository.findByCustomerId(userId);
     }
 
     @Override
-    public List<Order> getRestaurantsOrders(Long restaurantId) {
-        List<Order> restaurantOrders = orderRepository.findByRestaurantId(restaurantId);
-        if (restaurantOrders.isEmpty()) {
-            throw new OrderNotFoundException("No orders found for restaurant with ID: " + restaurantId);
-        }
-        return restaurantOrders;
+    public List<Order> getRestaurantsOrders(Long restaurantId, String orderStatus) {
+        List<Order> orders = orderRepository.findByRestaurantId(restaurantId);
+
+        return (orderStatus != null)
+                ? orders.stream().filter(order -> order.getOrderStatus().equalsIgnoreCase(orderStatus)).collect(Collectors.toList())
+                : orders;
     }
 
     @Override
-    public Order findOrderById(Long orderId) {
+    public Order findOrderById(Long orderId) throws OrderNotFoundException {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException("Order with ID " + orderId + " not found."));
     }
 }

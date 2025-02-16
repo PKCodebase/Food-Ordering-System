@@ -40,7 +40,7 @@ public class CartController {
     }
 
     @GetMapping("/total/{userId}")
-    public ResponseEntity<Long> calculateCartTotal(@PathVariable Long userId) throws CartNotFoundException {
+    public ResponseEntity<Double> calculateCartTotal(@PathVariable Long userId) throws CartNotFoundException {
         return ResponseEntity.ok(cartService.calculateCartTotal(userId));
     }
 
