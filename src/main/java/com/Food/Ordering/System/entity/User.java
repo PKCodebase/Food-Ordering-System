@@ -1,6 +1,7 @@
 package com.Food.Ordering.System.entity;
 
 import com.Food.Ordering.System.enums.Role;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -48,6 +49,7 @@ public class User {
     private List<Address> addresses;
 
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private Cart cart;
 
     @JsonManagedReference

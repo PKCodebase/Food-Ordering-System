@@ -37,8 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/restaurants/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER")
                         .requestMatchers("/food/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER")
                         .requestMatchers("/category/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER")
-
-
+                        .requestMatchers("/order/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER")
+                        .requestMatchers("/cart/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER", "ROLE_USER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

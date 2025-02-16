@@ -1,5 +1,6 @@
 package com.Food.Ordering.System.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,16 +17,46 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int quantity;
-    private Long price;
+    private Integer quantity;
+    private Double price;
 
     @ManyToOne
     @JoinColumn(name = "cart_id")
+    @JsonBackReference
     private Cart cart;
 
     @ManyToOne
     @JoinColumn(name = "food_id")
     private Food food;
+
+    private Double totalPrice; // Total price (quantity * price)
+
+    // ✅ Update price & totalPrice whenever quantity is set
+    public void updatePrice() {
+        if (food != null && food.getPrice() != null) {
+            this.price = Double.valueOf(food.getPrice());
+            this.totalPrice = this.price * this.quantity;
+        }
+    }
+
+    // ✅ Call updatePrice() whenever setting quantity
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+        updatePrice();
+    }
+
+    // ✅ Call updatePrice() whenever setting food
+    public void setFood(Food food) {
+        this.food = food;
+        updatePrice();
+    }
+
+
+    @PrePersist
+    @PreUpdate
+    public void calculatePrice() {
+        updatePrice();
+    }
 
     public Long getId() {
         return id;
@@ -35,19 +66,15 @@ public class CartItem {
         this.id = id;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public Long getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Long price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -63,7 +90,11 @@ public class CartItem {
         return food;
     }
 
-    public void setFood(Food food) {
-        this.food = food;
+    public Double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }

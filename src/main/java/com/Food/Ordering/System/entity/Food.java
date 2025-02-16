@@ -9,8 +9,7 @@ import java.util.List;
 @Data
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+
 @Entity
 public class Food {
 
@@ -45,6 +44,14 @@ public class Food {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "food")
     private List<OrderItem> orderItems;
+
+    // ✅ Add this constructor to allow Food(id) initialization
+    public Food(Long id) {
+        this.id = id;
+    }
+
+    // ✅ Default constructor (needed by JPA)
+    public Food() {}
 
 
     public Long getId() {

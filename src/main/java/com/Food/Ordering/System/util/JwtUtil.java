@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -21,9 +22,14 @@ public class JwtUtil {
     private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
 
     private Key getSigningKey() {
-        byte[] keyBytes = Base64.getDecoder().decode(jwtSecret);
+        String trimmedSecret = jwtSecret.replaceAll("\\s", ""); // Remove spaces & newlines
+        byte[] keyBytes = Base64.getUrlDecoder().decode(trimmedSecret); // Use URL decoder
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+
+
+
 
 
     public String generateToken(String username, String role) {
