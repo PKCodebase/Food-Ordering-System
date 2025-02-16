@@ -2,7 +2,6 @@ package com.Food.Ordering.System.service;
 
 import com.Food.Ordering.System.entity.IngredientCategory;
 import com.Food.Ordering.System.entity.IngredientsItem;
-import com.Food.Ordering.System.exception.CategoryNotFoundException;
 
 import java.util.List;
 
@@ -12,10 +11,9 @@ public interface IngredientsService {
 
     IngredientCategory findIngredientCategoryById(Long id);
 
-    List<IngredientCategory> findIngredientCategoryByRestaurantId(Long id) throws CategoryNotFoundException;
+    List<IngredientCategory> findIngredientCategoryByRestaurantId(Long id);
 
+    String createIngredientsItem(Long restaurantId, String ingredientName, Long ingredientCategoryId, Long price);
 
-    String createIngredientsItem(Long restaurantId, String ingredientName, Long ingredientCategoryId) throws Exception;
-
-    IngredientsItem updateStock(Long id);
+    IngredientsItem updateStock(Long id, Long price);
 }

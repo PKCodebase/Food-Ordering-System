@@ -20,7 +20,7 @@ public class IngredientCategory {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id",nullable = false)
     private Restaurant restaurant;
 
     public Long getId() {

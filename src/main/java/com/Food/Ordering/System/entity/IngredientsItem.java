@@ -17,7 +17,7 @@ public class IngredientsItem {
     private Long id;
 
     private String name;
-    private Long price;
+    private Long price=0l;
     private boolean available;
 
     @ManyToOne

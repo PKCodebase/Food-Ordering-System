@@ -2,8 +2,8 @@ package com.Food.Ordering.System.service.Impl;
 
 import com.Food.Ordering.System.entity.IngredientCategory;
 import com.Food.Ordering.System.entity.IngredientsItem;
-import com.Food.Ordering.System.exception.CategoryNotFoundException;
 import com.Food.Ordering.System.exception.IngredientCategoryNotFound;
+import com.Food.Ordering.System.exception.RestaurantNotFoundException;
 import com.Food.Ordering.System.repository.IngredientCategoryRepository;
 import com.Food.Ordering.System.repository.IngredientsItemRepository;
 import com.Food.Ordering.System.service.IngredientsService;
@@ -37,42 +37,47 @@ public class IngredientsServiceImpl implements IngredientsService {
     @Override
     public IngredientCategory findIngredientCategoryById(Long id) {
         return ingredientCategoryRepository.findById(id)
-                .orElseThrow(() -> new IngredientCategoryNotFound("Ingredient category not found"));
+                .orElseThrow(() -> new IngredientCategoryNotFound("Ingredient category not found with ID: " + id));
     }
 
     @Override
-    public List<IngredientCategory> findIngredientCategoryByRestaurantId(Long restaurantId) throws CategoryNotFoundException {
-        List<IngredientCategory> ingredientCategories = ingredientCategoryRepository.findByRestaurantId(restaurantId);
-        if (ingredientCategories.isEmpty()) {
-            throw new CategoryNotFoundException("No categories found for restaurant ID: " + restaurantId);
+    public List<IngredientCategory> findIngredientCategoryByRestaurantId(Long restaurantId) {
+        List<IngredientCategory> categories = ingredientCategoryRepository.findByRestaurantId(restaurantId);
+
+        if (categories.isEmpty()) {
+            throw new RestaurantNotFoundException("Ingredient category not found with Restaurant ID: " + restaurantId);
         }
-        return ingredientCategories;
 
+        return categories;
     }
 
+
     @Override
-    public String createIngredientsItem(Long restaurantId, String ingredientName, Long ingredientCategoryId) {
+    public String createIngredientsItem(Long restaurantId, String ingredientName, Long ingredientCategoryId, Long price) {
         IngredientCategory ingredientCategory = findIngredientCategoryById(ingredientCategoryId);
+
         IngredientsItem ingredientsItem = new IngredientsItem();
         ingredientsItem.setName(ingredientName);
+        ingredientsItem.setPrice(price);
         ingredientsItem.setRestaurant(restaurantService.getRestaurantById(restaurantId));
         ingredientsItem.setIngredientCategory(ingredientCategory);
         ingredientsItem.setAvailable(false);
+
         ingredientsItemRepository.save(ingredientsItem);
         return "Ingredient item added successfully";
     }
 
     @Override
-    public IngredientsItem updateStock(Long id) {
-
+    public IngredientsItem updateStock(Long id, Long price) {
         IngredientsItem ingredientsItem = ingredientsItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ingredient Item Not Found"));
 
-        // Toggle the inStock status
         ingredientsItem.setAvailable(!ingredientsItem.isAvailable());
 
-        // Save and return the updated item
+        if (price != null) {
+            ingredientsItem.setPrice(price);
+        }
+
         return ingredientsItemRepository.save(ingredientsItem);
     }
-
 }
